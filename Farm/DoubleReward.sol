@@ -253,7 +253,7 @@ library Address {
      * - `target` must be a contract.
      * - calling `target` with `data` must not revert.
      *
-     * _Available since v3.1._
+     * Available since v3.1.
      */
     function functionCall(address target, bytes memory data)
         internal
@@ -266,7 +266,7 @@ library Address {
      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
      * `errorMessage` as a fallback revert reason when `target` reverts.
      *
-     * _Available since v3.1._
+     * Available since v3.1.
      */
     function functionCall(
         address target,
@@ -285,7 +285,7 @@ library Address {
      * - the calling contract must have an ETH balance of at least `value`.
      * - the called Solidity function must be `payable`.
      *
-     * _Available since v3.1._
+     * Available since v3.1.
      */
     function functionCallWithValue(
         address target,
@@ -305,7 +305,7 @@ library Address {
      * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
      * with `errorMessage` as a fallback revert reason when `target` reverts.
      *
-     * _Available since v3.1._
+     * Available since v3.1.
      */
     function functionCallWithValue(
         address target,
@@ -329,7 +329,7 @@ library Address {
      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
      * but performing a static call.
      *
-     * _Available since v3.3._
+     * Available since v3.3.
      */
     function functionStaticCall(address target, bytes memory data)
         internal
@@ -348,7 +348,7 @@ library Address {
      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
      * but performing a static call.
      *
-     * _Available since v3.3._
+     * Available since v3.3.
      */
     function functionStaticCall(
         address target,
@@ -366,7 +366,7 @@ library Address {
      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
      * but performing a delegate call.
      *
-     * _Available since v3.3._
+     * Available since v3.3.
      */
     function functionDelegateCall(address target, bytes memory data)
         internal
@@ -384,7 +384,7 @@ library Address {
      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
      * but performing a delegate call.
      *
-     * _Available since v3.3._
+     * Available since v3.3.
      */
     function functionDelegateCall(
         address target,
@@ -667,326 +667,6 @@ abstract contract ReentrancyGuard {
     }
 }
 
-// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/EnumerableSet.sol";
-library EnumerableSet {
-    // To implement this library for multiple types with as little code
-    // repetition as possible, we write it in terms of a generic Set type with
-    // bytes32 values.
-    // The Set implementation uses private functions, and user-facing
-    // implementations (such as AddressSet) are just wrappers around the
-    // underlying Set.
-    // This means that we can only create new EnumerableSets for types that fit
-    // in bytes32.
-
-    struct Set {
-        // Storage of set values
-        bytes32[] _values;
-        // Position of the value in the `values` array, plus 1 because index 0
-        // means a value is not in the set.
-        mapping(bytes32 => uint256) _indexes;
-    }
-
-    /**
-     * @dev Add a value to a set. O(1).
-     *
-     * Returns true if the value was added to the set, that is if it was not
-     * already present.
-     */
-    function _add(Set storage set, bytes32 value) private returns (bool) {
-        if (!_contains(set, value)) {
-            set._values.push(value);
-            // The value is stored at length-1, but we add 1 to all indexes
-            // and use 0 as a sentinel value
-            set._indexes[value] = set._values.length;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @dev Removes a value from a set. O(1).
-     *
-     * Returns true if the value was removed from the set, that is if it was
-     * present.
-     */
-    function _remove(Set storage set, bytes32 value) private returns (bool) {
-        // We read and store the value's index to prevent multiple reads from the same storage slot
-        uint256 valueIndex = set._indexes[value];
-
-        if (valueIndex != 0) {
-            // Equivalent to contains(set, value)
-            // To delete an element from the _values array in O(1), we swap the element to delete with the last one in
-            // the array, and then remove the last element (sometimes called as 'swap and pop').
-            // This modifies the order of the array, as noted in {at}.
-
-            uint256 toDeleteIndex = valueIndex - 1;
-            uint256 lastIndex = set._values.length - 1;
-
-            // When the value to delete is the last one, the swap operation is unnecessary. However, since this occurs
-            // so rarely, we still do the swap anyway to avoid the gas cost of adding an 'if' statement.
-
-            bytes32 lastvalue = set._values[lastIndex];
-
-            // Move the last value to the index where the value to delete is
-            set._values[toDeleteIndex] = lastvalue;
-            // Update the index for the moved value
-            set._indexes[lastvalue] = toDeleteIndex + 1; // All indexes are 1-based
-
-            // Delete the slot where the moved value was stored
-            set._values.pop();
-
-            // Delete the index for the deleted slot
-            delete set._indexes[value];
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @dev Returns true if the value is in the set. O(1).
-     */
-    function _contains(Set storage set, bytes32 value)
-        private
-        view
-        returns (bool)
-    {
-        return set._indexes[value] != 0;
-    }
-
-    /**
-     * @dev Returns the number of values on the set. O(1).
-     */
-    function _length(Set storage set) private view returns (uint256) {
-        return set._values.length;
-    }
-
-    /**
-     * @dev Returns the value stored at position `index` in the set. O(1).
-     *
-     * Note that there are no guarantees on the ordering of values inside the
-     * array, and it may change when more values are added or removed.
-     *
-     * Requirements:
-     *
-     * - `index` must be strictly less than {length}.
-     */
-    function _at(Set storage set, uint256 index)
-        private
-        view
-        returns (bytes32)
-    {
-        require(
-            set._values.length > index,
-            "EnumerableSet: index out of bounds"
-        );
-        return set._values[index];
-    }
-
-    // Bytes32Set
-
-    struct Bytes32Set {
-        Set _inner;
-    }
-
-    /**
-     * @dev Add a value to a set. O(1).
-     *
-     * Returns true if the value was added to the set, that is if it was not
-     * already present.
-     */
-    function add(Bytes32Set storage set, bytes32 value)
-        internal
-        returns (bool)
-    {
-        return _add(set._inner, value);
-    }
-
-    /**
-     * @dev Removes a value from a set. O(1).
-     *
-     * Returns true if the value was removed from the set, that is if it was
-     * present.
-     */
-    function remove(Bytes32Set storage set, bytes32 value)
-        internal
-        returns (bool)
-    {
-        return _remove(set._inner, value);
-    }
-
-    /**
-     * @dev Returns true if the value is in the set. O(1).
-     */
-    function contains(Bytes32Set storage set, bytes32 value)
-        internal
-        view
-        returns (bool)
-    {
-        return _contains(set._inner, value);
-    }
-
-    /**
-     * @dev Returns the number of values in the set. O(1).
-     */
-    function length(Bytes32Set storage set) internal view returns (uint256) {
-        return _length(set._inner);
-    }
-
-    /**
-     * @dev Returns the value stored at position `index` in the set. O(1).
-     *
-     * Note that there are no guarantees on the ordering of values inside the
-     * array, and it may change when more values are added or removed.
-     *
-     * Requirements:
-     *
-     * - `index` must be strictly less than {length}.
-     */
-    function at(Bytes32Set storage set, uint256 index)
-        internal
-        view
-        returns (bytes32)
-    {
-        return _at(set._inner, index);
-    }
-
-    // AddressSet
-
-    struct AddressSet {
-        Set _inner;
-    }
-
-    /**
-     * @dev Add a value to a set. O(1).
-     *
-     * Returns true if the value was added to the set, that is if it was not
-     * already present.
-     */
-    function add(AddressSet storage set, address value)
-        internal
-        returns (bool)
-    {
-        return _add(set._inner, bytes32(uint256(value)));
-    }
-
-    /**
-     * @dev Removes a value from a set. O(1).
-     *
-     * Returns true if the value was removed from the set, that is if it was
-     * present.
-     */
-    function remove(AddressSet storage set, address value)
-        internal
-        returns (bool)
-    {
-        return _remove(set._inner, bytes32(uint256(value)));
-    }
-
-    /**
-     * @dev Returns true if the value is in the set. O(1).
-     */
-    function contains(AddressSet storage set, address value)
-        internal
-        view
-        returns (bool)
-    {
-        return _contains(set._inner, bytes32(uint256(value)));
-    }
-
-    /**
-     * @dev Returns the number of values in the set. O(1).
-     */
-    function length(AddressSet storage set) internal view returns (uint256) {
-        return _length(set._inner);
-    }
-
-    /**
-     * @dev Returns the value stored at position `index` in the set. O(1).
-     *
-     * Note that there are no guarantees on the ordering of values inside the
-     * array, and it may change when more values are added or removed.
-     *
-     * Requirements:
-     *
-     * - `index` must be strictly less than {length}.
-     */
-    function at(AddressSet storage set, uint256 index)
-        internal
-        view
-        returns (address)
-    {
-        return address(uint256(_at(set._inner, index)));
-    }
-
-    // UintSet
-
-    struct UintSet {
-        Set _inner;
-    }
-
-    /**
-     * @dev Add a value to a set. O(1).
-     *
-     * Returns true if the value was added to the set, that is if it was not
-     * already present.
-     */
-    function add(UintSet storage set, uint256 value) internal returns (bool) {
-        return _add(set._inner, bytes32(value));
-    }
-
-    /**
-     * @dev Removes a value from a set. O(1).
-     *
-     * Returns true if the value was removed from the set, that is if it was
-     * present.
-     */
-    function remove(UintSet storage set, uint256 value)
-        internal
-        returns (bool)
-    {
-        return _remove(set._inner, bytes32(value));
-    }
-
-    /**
-     * @dev Returns true if the value is in the set. O(1).
-     */
-    function contains(UintSet storage set, uint256 value)
-        internal
-        view
-        returns (bool)
-    {
-        return _contains(set._inner, bytes32(value));
-    }
-
-    /**
-     * @dev Returns the number of values on the set. O(1).
-     */
-    function length(UintSet storage set) internal view returns (uint256) {
-        return _length(set._inner);
-    }
-
-    /**
-     * @dev Returns the value stored at position `index` in the set. O(1).
-     *
-     * Note that there are no guarantees on the ordering of values inside the
-     * array, and it may change when more values are added or removed.
-     *
-     * Requirements:
-     *
-     * - `index` must be strictly less than {length}.
-     */
-    function at(UintSet storage set, uint256 index)
-        internal
-        view
-        returns (uint256)
-    {
-        return uint256(_at(set._inner, index));
-    }
-}
-
 /**
  * @dev Contract module which allows children to implement an emergency stop
  * mechanism that can be triggered by an authorized account.
@@ -1086,7 +766,9 @@ abstract contract Pausable is Context {
  */
 abstract contract Ownable is Context {
     address private _owner;
-
+    uint256 public renounceOwnershipTimestamp;
+    uint256 public transferOwnershipTimestamp;
+    address public newOwner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
@@ -1095,6 +777,7 @@ abstract contract Ownable is Context {
     constructor () public {
         address msgSender = _msgSender();
         _owner = msgSender;
+        newOwner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
     }
 
@@ -1113,6 +796,11 @@ abstract contract Ownable is Context {
         _;
     }
 
+    function setTransferOwnershipTimestamp(address _newOwner) external onlyOwner{
+        newOwner = _newOwner;
+        transferOwnershipTimestamp = block.timestamp + 1 days;
+    }
+
     /**
      * @dev Leaves the contract without owner. It will not be possible to call
      * `onlyOwner` functions anymore. Can only be called by the current owner.
@@ -1120,17 +808,23 @@ abstract contract Ownable is Context {
      * NOTE: Renouncing ownership will leave the contract without an owner,
      * thereby removing any functionality that is only available to the owner.
      */
-    function renounceOwnership() public virtual onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
+    function renounceOwnership() external virtual onlyOwner {
+        if(renounceOwnershipTimestamp == 0){
+            renounceOwnershipTimestamp = block.timestamp + 1 days;
+        }else{
+            require(renounceOwnershipTimestamp <= block.timestamp, "you can't renounce the ownership");
+            emit OwnershipTransferred(_owner, address(0));
+            _owner = address(0);
+        }
     }
 
     /**
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      * Can only be called by the current owner.
      */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
+    function transferOwnership() external virtual onlyOwner {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
+        require(transferOwnershipTimestamp <= block.timestamp, "you can't change the owner");
         emit OwnershipTransferred(_owner, newOwner);
         _owner = newOwner;
     }
@@ -1157,6 +851,7 @@ interface IVault {
 contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using Address for address;
 
     struct UserInfo {
         uint256 amount; // amount of lpToken
@@ -1188,7 +883,6 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event Claim(address indexed user, uint256 indexed pid, uint256 amount);
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
-    address governance;
     mapping(uint256 => bool) public pausedPool;
     
     /**
@@ -1236,35 +930,6 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
     }
     
     /**
-     * @dev used to get the totalSupply in a pool
-     */
-    function getTotalSupply(uint256 _pid) external view returns(uint256){
-        PoolInfo memory pool = poolInfo[_pid];
-        return pool.totalSupply;
-    }
-    
-    /**
-     * @dev used to get the fee of a pool
-     */
-    function getFee(uint256 _pid) external view returns(uint256){
-        PoolInfo memory pool = poolInfo[_pid];
-        return pool.fee;
-    }
-    
-    /**
-     * @dev used to get the krw per block
-     */
-    function getFirstPerBlock(uint256 _pid) external view returns(uint256){
-        PoolInfo memory pool = poolInfo[_pid];
-        return pool.firstPerBlock;
-    }
-    
-    function getSecondPerBlock(uint256 _pid) external view returns(uint256){
-        PoolInfo memory pool = poolInfo[_pid];
-        return pool.secondPerBlock;
-    }
-    
-    /**
      * @dev Add a new lp to the pool. Can only be called by the owner.
      * Can only be called by the current owner.
      * _lpToken: the liquidity pool token that you want to use in the farm 
@@ -1276,7 +941,16 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * NOTE: mint is actually the wrong word for this case, because all the krw are pre-minted and will be just transfered when people claim their rewards
      */
     function createPool(address _lpToken, string memory _symbol, uint16 _fee, address _vault, uint256 _firstPerBlock, uint256 _secondPerBlock, address _first, address _second, uint256 _desiredBlock) external onlyOwner{
-        require(tokenAlreadyInPool[_lpToken] == false);
+        require(!tokenAlreadyInPool[_lpToken], "Token already in a pool");
+        require(_vault != address(0x0), "Vault is the zero address");
+        require(_first != address(0x0), "First is the zero address");
+        require(_second != address(0x0), "Second is the zero address");
+        require(_fee <= 1000, "Fee is to high");
+        require(_first != _lpToken, "the first token needs to be different from the lp");
+        require(_second != _lpToken, "the second token needs to be different from the lp");
+        require(_lpToken.isContract(), "the lp token needs to be a contract");
+        require(_first.isContract(), "the first token needs to be a contract");
+        require(_second.isContract(), "the second token needs to be a contract");
         poolInfo.push(PoolInfo(IERC20(_lpToken), _symbol, _fee, _vault, 0, _firstPerBlock, _secondPerBlock ,block.number, 0, 0, IERC20(_first), IERC20(_second), block.number.add(_desiredBlock)));
         tokenAlreadyInPool[_lpToken] = true;
     }
@@ -1285,10 +959,29 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * @dev Changes the vault address
      * _pid: the id of the pool that needs to change the vault address
      * _vault: the new vault address
+     * _isVaultContract: variable that checks if the vault is a smart contract or an EOA and updates the vault pools accordingly
      */
     function changeVault(uint256 _pid, address _vault) external onlyOwner {
         PoolInfo storage pool = poolInfo[_pid];
         pool.vault = _vault;
+    }
+    
+    function changeFirst(uint256 _pid, address _first) external onlyOwner{
+        PoolInfo storage pool = poolInfo[_pid];
+        require(_first != address(0x0), "First is the zero address");
+        require(address(_first) != address(pool.lpToken), "the first token needs to be different from the lp");
+        require(pool.totalSupply == 0, "totalSupply needs to be 0 to change the address");
+        require(_first.isContract(), "the token needs to be a contract");
+        pool.first = IERC20(_first);
+    }
+    
+    function changeSecond(uint256 _pid, address _second) external onlyOwner{
+        PoolInfo storage pool = poolInfo[_pid];
+        require(_second != address(0x0), "First is the zero address");
+        require(address(_second) != address(pool.lpToken), "the first token needs to be different from the lp");
+        require(pool.totalSupply == 0, "totalSupply needs to be 0 to change the address");
+        require(_second.isContract(), "the token needs to be a contract");
+        pool.second = IERC20(_second);
     }
     
     /**
@@ -1296,7 +989,8 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * _pid: is the id of the pool that you want to apply this changes
      * _fee: is the new fee of the pool
      */
-    function changeFee(uint256 _pid, uint16 _fee) public onlyOwner{
+    function changeFee(uint256 _pid, uint16 _fee) external onlyOwner{
+        require(_fee <= 1000, "Fee is to high");
         PoolInfo storage pool = poolInfo[_pid];
         pool.fee = _fee;
     }
@@ -1350,9 +1044,8 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * @dev function used to update all the last reward numbers when the pause/unpaused function is used
      */
     function updateAllLastRewardNumbers() internal {
-        for(uint256 i = 0; i < poolLength(); i++){
-            PoolInfo storage pool = poolInfo[i];
-            pool.lastRewardBlock = block.number;
+        for(uint256 i; i < poolLength(); i++){
+            changeLastRewardBlock(i);
         }
     }
     
@@ -1369,9 +1062,8 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * @dev used to pause a single pool from being able to deposit new lpToken
      */
     function pausePool(uint256 _pid) external onlyOwner{
-        PoolInfo storage pool = poolInfo[_pid];
+        changeLastRewardBlock(_pid);
         pausedPool[_pid] = true;
-        pool.lastRewardBlock = block.number;
     }
     
     /**
@@ -1387,9 +1079,8 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * @dev used to unpause a single pool
      */
     function unpausePool(uint256 _pid) external onlyOwner{
-        PoolInfo storage pool = poolInfo[_pid];
+        changeLastRewardBlock(_pid);
         pausedPool[_pid] = false;
-        pool.lastRewardBlock = block.number;
     }
     
     /**
@@ -1403,12 +1094,12 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
         updatePool(_pid);
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        require(block.number <= pool.lastBlock);
+        require(block.number <= pool.lastBlock, "Last Block of the pool is anterior to the actual block number");
         uint256 fee = (_amount.mul(pool.fee)).div(10000);
         uint256 newAmount = _amount.sub(fee);
         pool.lpToken.safeTransferFrom(msg.sender, address(this), _amount);
         if(pool.fee != 0){
-            pool.lpToken.transfer(address(pool.vault), fee);
+            pool.lpToken.safeTransfer(address(pool.vault), fee);
         }
         user.rewardMinusFirst = user.rewardMinusFirst.add((pool.firstRewardsPerShare.mul(newAmount)).div(1e18));
         user.rewardMinusSecond = user.rewardMinusSecond.add((pool.secondRewardsPerShare.mul(newAmount)).div(1e18));
@@ -1473,8 +1164,8 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
             return;
         }
         if(!pausedUpdatePools && !pausedPool[_pid]){
-            uint256 firstRewardToDeliver = 0;
-            uint256 secondRewardToDeliver = 0;
+            uint256 firstRewardToDeliver;
+            uint256 secondRewardToDeliver;
             if(pool.lastBlock > block.number){
                 firstRewardToDeliver = pool.firstPerBlock.mul(block.number.sub(pool.lastRewardBlock));
                 secondRewardToDeliver = pool.secondPerBlock.mul(block.number.sub(pool.lastRewardBlock));
@@ -1498,7 +1189,7 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      */
     function massUpdatePools() external onlyOwner{
         uint256 length = poolInfo.length;
-        for (uint256 pid = 0; pid < length; ++pid) {
+        for (uint256 pid; pid < length; ++pid) {
             updatePool(pid);
         }
     }
@@ -1507,28 +1198,26 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
      * @dev function used to withdraw the rewards earned
      * _pid: is the id of the pool that you want to use
      */
-    function claimFirst(uint256 _pid) public nonReentrant{
+    function claimFirst(uint256 _pid) external nonReentrant{
         updatePool(_pid);
         UserInfo storage user = userInfo[_pid][msg.sender];
         PoolInfo memory pool = poolInfo[_pid];
-        if(pool.first.transfer(msg.sender, getPendingFirst(_pid,msg.sender))){
-          user.rewardMinusFirst = user.amount.mul(pool.firstRewardsPerShare).div(1e18);
-          emit Claim(msg.sender, _pid, getPendingFirst(_pid,msg.sender)); 
-        }
+        pool.first.safeTransfer(msg.sender, getPendingFirst(_pid,msg.sender));
+        user.rewardMinusFirst = user.amount.mul(pool.firstRewardsPerShare).div(1e18);
+        emit Claim(msg.sender, _pid, getPendingFirst(_pid,msg.sender)); 
     }
     
     /**
      * @dev function used to withdraw the rewards earned
      * _pid: is the id of the pool that you want to use
      */
-    function claimSecond(uint256 _pid) public nonReentrant{
+    function claimSecond(uint256 _pid) external nonReentrant{
         updatePool(_pid);
         UserInfo storage user = userInfo[_pid][msg.sender];
         PoolInfo memory pool = poolInfo[_pid];
-        if(pool.second.transfer(msg.sender, getPendingSecond(_pid,msg.sender))){
-          user.rewardMinusSecond = user.amount.mul(pool.secondRewardsPerShare).div(1e18);
-          emit Claim(msg.sender, _pid, getPendingSecond(_pid,msg.sender)); 
-        }
+        pool.second.safeTransfer(msg.sender, getPendingSecond(_pid,msg.sender));
+        user.rewardMinusSecond = user.amount.mul(pool.secondRewardsPerShare).div(1e18);
+        emit Claim(msg.sender, _pid, getPendingSecond(_pid,msg.sender)); 
     }
     
     /**
@@ -1539,14 +1228,12 @@ contract DoubleMaster is ReentrancyGuard, Pausable, Ownable{
         updatePool(_pid);
         UserInfo storage user = userInfo[_pid][msg.sender];
         PoolInfo memory pool = poolInfo[_pid];
-        if(pool.first.transfer(msg.sender, getPendingFirst(_pid,msg.sender))){
-          user.rewardMinusFirst = user.amount.mul(pool.firstRewardsPerShare).div(1e18);
-          emit Claim(msg.sender, _pid, getPendingFirst(_pid,msg.sender)); 
-        }
-        if(pool.second.transfer(msg.sender, getPendingSecond(_pid,msg.sender))){
-          user.rewardMinusSecond = user.amount.mul(pool.secondRewardsPerShare).div(1e18);
-          emit Claim(msg.sender, _pid, getPendingSecond(_pid,msg.sender)); 
-        }
+        pool.first.safeTransfer(msg.sender, getPendingFirst(_pid,msg.sender));
+        user.rewardMinusFirst = user.amount.mul(pool.firstRewardsPerShare).div(1e18);
+        emit Claim(msg.sender, _pid, getPendingFirst(_pid,msg.sender)); 
+        pool.second.safeTransfer(msg.sender, getPendingSecond(_pid,msg.sender));
+        user.rewardMinusSecond = user.amount.mul(pool.secondRewardsPerShare).div(1e18);
+        emit Claim(msg.sender, _pid, getPendingSecond(_pid,msg.sender)); 
     }
     
 }
